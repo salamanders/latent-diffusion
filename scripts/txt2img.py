@@ -14,7 +14,8 @@ from ldm.models.diffusion.plms import PLMSSampler
 
 def load_model_from_config(config, ckpt, verbose=False):
     print(f"Loading model from {ckpt}")
-    pl_sd = torch.load(ckpt, map_location="cpu")
+    device = torch.device("cpu")
+    pl_sd = torch.load(ckpt, map_location=device)
     sd = pl_sd["state_dict"]
     model = instantiate_from_config(config.model)
     m, u = model.load_state_dict(sd, strict=False)
@@ -25,7 +26,7 @@ def load_model_from_config(config, ckpt, verbose=False):
         print("unexpected keys:")
         print(u)
 
-    model.cuda()
+    model.cpu()
     model.eval()
     return model
 
@@ -130,9 +131,9 @@ if __name__ == "__main__":
         with model.ema_scope():
             uc = None
             if opt.scale != 1.0:
-                uc = model.get_learned_conditioning(opt.n_samples * [""])
+                uc = model.get_learned_conditioning((opt.n_samples * [""]))
             for n in trange(opt.n_iter, desc="Sampling"):
-                c = model.get_learned_conditioning(opt.n_samples * [prompt])
+                c = model.get_learned_conditioning((opt.n_samples * [prompt]))
                 shape = [4, opt.H//8, opt.W//8]
                 samples_ddim, _ = sampler.sample(S=opt.ddim_steps,
                                                  conditioning=c,
