@@ -1,3 +1,4 @@
+import scann
 import argparse, os, sys, glob
 import clip
 import torch
@@ -9,7 +10,6 @@ from tqdm import tqdm, trange
 from itertools import islice
 from einops import rearrange, repeat
 from torchvision.utils import make_grid
-import scann
 import time
 from multiprocessing import cpu_count
 
